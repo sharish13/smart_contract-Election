@@ -18,24 +18,27 @@ def test_deploy_nd_add_candidates():
 
 
 def test_deploy_nd_add_candidates_from_other_account():
-    account = get_account()
-    election = deploy_Election()
+
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("only for local testing")
     bad_actor = accounts[1]
     with pytest.raises(exceptions.VirtualMachineError):
+        account = get_account()
+        election = deploy_Election()
         tx = election.add_candidate("Harry", {"from": bad_actor})
 
 
 def test_vote_before_election_starts():
-    election = test_deploy_nd_add_candidates()
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("only for local testing")
     with pytest.raises(exceptions.VirtualMachineError):
+        election = test_deploy_nd_add_candidates()
         tx = election.vote("Harry", {"from": accounts[1]})
 
 
 def test_voting():
+    if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
+        pytest.skip("only for local testing")
     election = test_deploy_nd_add_candidates()
     tx1 = election.start_election({"from": get_account()})
     tx1.wait(1)
@@ -47,14 +50,16 @@ def test_voting():
 
 
 def test_vote_more_than_once():
-    election = test_voting()
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("only for local testing")
     with pytest.raises(exceptions.VirtualMachineError):
+        election = test_voting()
         tx = election.vote("Allen", {"from": accounts[1]})
 
 
 def test_check_the_winner():
+    if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
+        pytest.skip("only for local testing")
     account = get_account()
     election = deploy_Election()
     tx = election.add_candidate("Harry", {"from": account})
@@ -76,8 +81,8 @@ def test_check_the_winner():
 
 
 def test_vote_nd_stop_election_then_try_to_vote():
-    election = test_check_the_winner()
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("only for local testing")
     with pytest.raises(exceptions.VirtualMachineError):
+        election = test_check_the_winner()
         tx = election.vote("Allen", {"from": accounts[4]})
